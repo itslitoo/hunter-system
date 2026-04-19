@@ -563,7 +563,16 @@ let state = JSON.parse(localStorage.getItem('hunter_state') || 'null') || {
   },
   activeDay: 'Mon',
   waterCups: 0,
-  bodyWeightLog: [],
+  bodyWeightLog: [
+    {date:'25/06/2021', kg:68.4, smm:37.2, pbf:6.0},
+    {date:'06/07/2025', kg:69.3, smm:37.7, pbf:5.9},
+    {date:'21/07/2025', kg:70.5, smm:38.2, pbf:6.2},
+    {date:'13/08/2025', kg:71.9, smm:38.4, pbf:7.4},
+    {date:'27/09/2025', kg:73.3, smm:39.1, pbf:8.0},
+    {date:'07/12/2025', kg:76.6, smm:39.2, pbf:11.7},
+    {date:'25/01/2026', kg:74.7, smm:39.0, pbf:10.6},
+    {date:'01/04/2026', kg:73.0, smm:38.4, pbf:9.4},
+  ],
   achievements: [],
   streak: 0,
   bestStreak: 0,
@@ -1273,6 +1282,22 @@ function getMealPlan() {
 }
 
 const DIET_VERSION = 2;
+const BW_VERSION = 1;
+if(!state.bwVersion || state.bwVersion < BW_VERSION) {
+  state.bodyWeightLog = [
+    {date:'25/06/2021', kg:68.4, smm:37.2, pbf:6.0},
+    {date:'06/07/2025', kg:69.3, smm:37.7, pbf:5.9},
+    {date:'21/07/2025', kg:70.5, smm:38.2, pbf:6.2},
+    {date:'13/08/2025', kg:71.9, smm:38.4, pbf:7.4},
+    {date:'27/09/2025', kg:73.3, smm:39.1, pbf:8.0},
+    {date:'07/12/2025', kg:76.6, smm:39.2, pbf:11.7},
+    {date:'25/01/2026', kg:74.7, smm:39.0, pbf:10.6},
+    {date:'01/04/2026', kg:73.0, smm:38.4, pbf:9.4},
+  ];
+  state.bwVersion = BW_VERSION;
+  save();
+  console.log('Body composition history loaded');
+}
 if(!state.dietVersion || state.dietVersion < DIET_VERSION) {
   const plan = getMealPlan();
   ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(day => {
