@@ -370,6 +370,19 @@ body { font-family: var(--font); color: var(--white); overscroll-behavior: none;
         <div style="font-size:12px;color:var(--muted2);text-align:center;padding:10px;">No exercises logged yet. Start your quest!</div>
       </div>
     </div>
+
+    <div class="panel">
+      <div class="panel-hdr">Cardio log 🏃</div>
+      <div id="cardio-weekly" style="display:flex;gap:5px;margin-bottom:10px;align-items:flex-end;height:48px;"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px;" id="cardio-stats"></div>
+      <div id="cardio-history" style="margin-bottom:8px;"></div>
+      <div style="font-size:10px;color:var(--muted2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Log session</div>
+      <div style="display:flex;gap:5px;">
+        <input class="log-input" id="cardio-date" placeholder="DD/MM/YYYY" style="flex:1;"/>
+        <input class="log-input" id="cardio-duration" placeholder="Duration (min)" type="number" style="flex:1;"/>
+        <button class="log-submit" onclick="logCardio()">+ Log</button>
+      </div>
+    </div>
   </div>
 
   <div class="scroll-area" id="tab-quest" style="display:none;">
@@ -578,6 +591,7 @@ let state = JSON.parse(localStorage.getItem('hunter_state') || 'null') || {
   bestStreak: 0,
   totalQuests: 0,
   lastQuestDate: null,
+  cardioLog: [],
   dietDays: 0,
 };
 
@@ -655,6 +669,7 @@ function renderStatus() {
 
   renderBWChart();
   renderPRBoard();
+  renderCardio();
 }
 
 let activeBWTab = 'weight';
@@ -1254,6 +1269,82 @@ function showToast(msg) {
 function todayStr() {
   const d = new Date();
   return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+
+// CARDIO
+function logCardio() {
+  const date = document.getElementById('cardio-date').value.trim() || todayStr();
+  const duration = parseInt(document.getElementById('cardio-duration').value);
+  if(!duration || duration <= 0) { showToast('Enter duration in minutes'); return; }
+  state.cardioLog.push({ date, duration, type: 'Treadmill' });
+  if(state.cardioLog.length > 60) state.cardioLog = state.cardioLog.slice(-60);
+  document.getElementById('cardio-date').value = '';
+  document.getElementById('cardio-duration').value = '';
+  addXP(duration);
+  save();
+  renderCardio();
+  showToast(`Cardio logged: ${duration} min ⚡`);
+}
+
+function renderCardio() {
+  if(!document.getElementById('cardio-weekly')) return;
+  const logs = state.cardioLog;
+
+  // Weekly bar chart (last 7 entries)
+  const weekly = document.getElementById('cardio-weekly');
+  const recent = logs.slice(-7);
+  if(!recent.length) {
+    weekly.innerHTML = '<div style="font-size:11px;color:var(--muted2);">No cardio logged yet.</div>';
+  } else {
+    const max = Math.max(...recent.map(l=>l.duration));
+    weekly.innerHTML = recent.map((l,i) => {
+      const h = Math.round((l.duration/max)*40)+6;
+      const isLast = i===recent.length-1;
+      return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;">
+        <div style="font-size:9px;color:${isLast?'var(--light)':'var(--muted2)'};">${l.duration}m</div>
+        <div style="width:100%;height:${h}px;background:${isLast?'var(--purple)':'var(--border2)'};"></div>
+        <div style="font-size:9px;color:var(--muted2);">${l.date.split('/').slice(0,2).join('/')}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Stats
+  const stats = document.getElementById('cardio-stats');
+  const thisWeek = logs.filter(l => {
+    const parts = l.date.split('/');
+    if(parts.length < 3) return false;
+    const d = new Date(parts[2], parts[1]-1, parts[0]);
+    const now = new Date();
+    const diff = (now - d) / (1000*60*60*24);
+    return diff <= 7;
+  });
+  const totalMin = thisWeek.reduce((s,l)=>s+l.duration,0);
+  const sessions = thisWeek.length;
+  const avgMin = sessions ? Math.round(totalMin/sessions) : 0;
+  stats.innerHTML = [
+    {lbl:'This week', val: sessions + ' sessions'},
+    {lbl:'Total time', val: totalMin + ' min'},
+    {lbl:'Avg session', val: avgMin + ' min'},
+  ].map(s=>`<div style="background:var(--bg3);border:1px solid var(--border);padding:8px 10px;">
+    <div style="font-size:10px;color:var(--muted2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">${s.lbl}</div>
+    <div style="font-size:14px;font-weight:700;color:var(--white);">${s.val}</div>
+  </div>`).join('');
+
+  // History list (last 5)
+  const hist = document.getElementById('cardio-history');
+  const last5 = [...logs].reverse().slice(0,5);
+  if(!last5.length) { hist.innerHTML=''; return; }
+  hist.innerHTML = last5.map((l,i) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);${i===last5.length-1?'border-bottom:none;':''}">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="font-size:13px;">🏃</div>
+        <div>
+          <div style="font-size:12px;color:var(--white);font-weight:500;">Treadmill</div>
+          <div style="font-size:10px;color:var(--muted);">${l.date}</div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--light);font-weight:600;">${l.duration} min</div>
+    </div>`).join('');
 }
 
 // MIGRATION — auto-load diet plan if meals are empty
