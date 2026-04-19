@@ -718,10 +718,72 @@ function renderSplitContent() {
   if(!split.exercises.length) {
     if(split.name === 'Rest Day') {
       content.innerHTML = `
-        <div style="text-align:center;padding:24px 16px;">
-          <div style="font-size:36px;margin-bottom:12px;">😴</div>
-          <div style="font-size:15px;color:var(--white);font-weight:500;letter-spacing:0.06em;margin-bottom:6px;">REST PROTOCOL ACTIVE</div>
-          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Recovery is part of the grind.<br>The System commands you to rest today.</div>
+        <div style="padding:8px 4px;">
+          <div style="
+            background:#03050f;
+            border:1px solid #1a4a8a;
+            border-top:3px solid #2a7fff;
+            position:relative;
+            padding:0;
+            overflow:hidden;
+          ">
+            <div style="
+              position:absolute;top:0;left:0;right:0;bottom:0;
+              background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,80,255,0.015) 2px,rgba(0,80,255,0.015) 4px);
+              pointer-events:none;
+            "></div>
+            <div style="
+              background:#0a1628;
+              border-bottom:1px solid #1a4a8a;
+              padding:8px 14px;
+              display:flex;align-items:center;gap:8px;
+            ">
+              <div style="
+                width:18px;height:18px;border-radius:50%;
+                border:1.5px solid #4a9fff;
+                display:flex;align-items:center;justify-content:center;
+                font-size:11px;color:#4a9fff;font-weight:700;flex-shrink:0;
+              ">!</div>
+              <div style="font-size:12px;color:#4a9fff;letter-spacing:0.25em;font-weight:700;">NOTIFICATION</div>
+            </div>
+            <div style="padding:20px 18px 24px;">
+              <div style="font-size:11px;color:#3a6aaa;letter-spacing:0.12em;margin-bottom:14px;">[System Message]</div>
+              <div style="font-size:15px;color:#e8f4ff;font-weight:500;line-height:1.7;letter-spacing:0.03em;margin-bottom:20px;">
+                This day has been designated as a<br>
+                <span style="color:#4a9fff;font-weight:700;">Recovery Protocol.</span><br><br>
+                The body grows stronger in rest.<br>
+                Compliance is <span style="color:#4a9fff;">mandatory.</span>
+              </div>
+              <div style="
+                border:1px solid #1a4a8a;
+                background:#060d1a;
+                padding:10px 14px;
+                margin-bottom:20px;
+              ">
+                <div style="font-size:10px;color:#3a6aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Daily Objectives</div>
+                <div style="font-size:12px;color:#8ab8e8;line-height:1.9;">
+                  ◆ Sleep 7–9 hours<br>
+                  ◆ Hydration: 8 cups minimum<br>
+                  ◆ Light stretching permitted<br>
+                  ◆ Fuel your supply (diet log)
+                </div>
+              </div>
+              <div style="
+                border-top:1px solid #1a3a6a;
+                padding-top:14px;
+                display:flex;justify-content:space-between;align-items:center;
+              ">
+                <div style="font-size:10px;color:#2a5a9a;letter-spacing:0.08em;">FAILURE TO COMPLY MAY RESULT IN PENALTY</div>
+                <div style="
+                  border:1px solid #1a4a8a;
+                  padding:6px 16px;
+                  font-size:11px;color:#4a9fff;
+                  letter-spacing:0.1em;cursor:pointer;
+                  background:#060d1a;
+                ">OK</div>
+              </div>
+            </div>
+          </div>
         </div>`;
       return;
     }
