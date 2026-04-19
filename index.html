@@ -1247,6 +1247,44 @@ function todayStr() {
   return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
 }
 
+// MIGRATION — auto-load diet plan if meals are empty
+function getMealPlan() {
+  return [
+    {name:'Banana', grams:'200', kcal:'178', protein:'2.2', carbs:'45.5', fat:'0.7', mealType:'Before Workout', alt:'Sweet potato (roasted) 220g / Dates (dried) 60g'},
+    {name:'Dark Chocolate 70-85%', grams:'30', kcal:'179', protein:'2.3', carbs:'13.9', fat:'12.7', mealType:'Before Workout', alt:'Unsalted peanut butter 30g'},
+    {name:'Brown toast (bun)', grams:'60', kcal:'159', protein:'5.5', carbs:'29.5', fat:'2.1', mealType:'After Workout', alt:'Tortilla 50g / Whole wheat bread 60g'},
+    {name:'Full omelette eggs', grams:'110', kcal:'157', protein:'10.7', carbs:'1.1', fat:'12.1', mealType:'After Workout', alt:''},
+    {name:'Cheddar lite cheese', grams:'40', kcal:'83', protein:'11.1', carbs:'2.6', fat:'2.7', mealType:'After Workout', alt:'Low fat mozzarella 25g'},
+    {name:'Quick oats (Lino)', grams:'50', kcal:'189', protein:'6.5', carbs:'32.5', fat:'3.3', mealType:'Breakfast', alt:'Corn flakes 40g / Cooked wheat 120g / Granola 50g'},
+    {name:'Skimmed milk', grams:'240', kcal:'83', protein:'8.2', carbs:'11.5', fat:'0.2', mealType:'Breakfast', alt:''},
+    {name:'Dates (dried)', grams:'30', kcal:'83', protein:'0.8', carbs:'22.3', fat:'0.1', mealType:'Breakfast', alt:''},
+    {name:'Basmati rice (boiled)', grams:'250', kcal:'325', protein:'6.7', carbs:'70.5', fat:'0.7', mealType:'Lunch', alt:'Whole wheat pasta (cooked) 220g'},
+    {name:'Boiled potatoes', grams:'100', kcal:'77', protein:'2.0', carbs:'17.5', fat:'0.1', mealType:'Lunch', alt:'Cooked molokhia 180g / Cooked zucchini 500g'},
+    {name:'Grilled chicken breast', grams:'220', kcal:'341', protein:'63.8', carbs:'0', fat:'7.3', mealType:'Lunch', alt:'Grilled bouri fish 220g / Beef steak 220g / Grilled kofta 220g / Lean grilled beef 220g'},
+    {name:'Olive oil', grams:'10', kcal:'88', protein:'0', carbs:'0', fat:'10.0', mealType:'Lunch', alt:''},
+    {name:'Sweet potato (roasted)', grams:'100', kcal:'103', protein:'2.3', carbs:'23.6', fat:'0.1', mealType:'Snack', alt:'Homemade popcorn 25g'},
+    {name:'Almonds (unsalted)', grams:'25', kcal:'144', protein:'5.3', carbs:'4.9', fat:'12.5', mealType:'Snack', alt:'Unsalted peanut butter 25g / Dark chocolate 70-85% 30g'},
+    {name:'Brown toast (bun)', grams:'60', kcal:'159', protein:'5.5', carbs:'29.5', fat:'2.1', mealType:'Dinner', alt:'Tortilla 50g'},
+    {name:'Ful medames (Egyptian style)', grams:'150', kcal:'173', protein:'9.9', carbs:'28.5', fat:'2.3', mealType:'Dinner', alt:'Healthy falafel (air fryer) 100g'},
+    {name:'Light cream cheese', grams:'30', kcal:'53', protein:'2.0', carbs:'1.8', fat:'4.4', mealType:'Dinner', alt:''},
+    {name:'Cucumber (peeled)', grams:'100', kcal:'12', protein:'0.6', carbs:'1.8', fat:'0.1', mealType:'Dinner', alt:''},
+    {name:'Olive oil', grams:'10', kcal:'88', protein:'0', carbs:'0', fat:'10.0', mealType:'Dinner', alt:''},
+  ];
+}
+
+const DIET_VERSION = 1;
+if(!state.dietVersion || state.dietVersion < DIET_VERSION) {
+  const plan = getMealPlan();
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(day => {
+    if(!state.meals[day] || state.meals[day].length === 0) {
+      state.meals[day] = plan;
+    }
+  });
+  state.dietVersion = DIET_VERSION;
+  save();
+  console.log('Diet plan migrated to version', DIET_VERSION);
+}
+
 // INIT
 updateHeader();
 updateClock();
