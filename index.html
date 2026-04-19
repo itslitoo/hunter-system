@@ -1272,13 +1272,11 @@ function getMealPlan() {
   ];
 }
 
-const DIET_VERSION = 1;
+const DIET_VERSION = 2;
 if(!state.dietVersion || state.dietVersion < DIET_VERSION) {
   const plan = getMealPlan();
   ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(day => {
-    if(!state.meals[day] || state.meals[day].length === 0) {
-      state.meals[day] = plan;
-    }
+    state.meals[day] = plan;
   });
   state.dietVersion = DIET_VERSION;
   save();
