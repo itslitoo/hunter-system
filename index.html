@@ -201,7 +201,7 @@ body { font-family: var(--font); color: var(--text); overscroll-behavior: none; 
 .streak-lbl { font-size: 10px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 2px; }
 .streak-fire { color: var(--green3); }
 
-.bw-chart { display: flex; align-items: flex-end; gap: 4px; height: 48px; margin-bottom: 6px; }
+.bw-chart { display: flex; align-items: flex-end; gap: 4px; height: 70px; margin-bottom: 6px; overflow: visible; }
 .bw-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
 .bw-bar { width: 100%; background: var(--border2); border-radius: 4px; }
 .bw-bar.today { background: var(--green3); }
@@ -333,7 +333,7 @@ body { font-family: var(--font); color: var(--text); overscroll-behavior: none; 
         <div class="bw-metric-tab" id="bwt-smm" onclick="setBWTab('smm')">SMM</div>
         <div class="bw-metric-tab" id="bwt-pbf" onclick="setBWTab('pbf')">PBF %</div>
       </div>
-      <div class="bw-chart" id="bw-chart" style="margin-top:12px;"></div>
+      <div class="bw-chart" id="bw-chart" style="margin-top:16px;height:70px;"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 0;" id="bw-latest"></div>
       <div style="font-size:10px;color:var(--muted2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Log new entry</div>
       <div style="display:flex;gap:5px;margin-bottom:5px;">
@@ -689,7 +689,7 @@ function renderBWChart() {
     const min = Math.min(...vals) - 1;
     chart.innerHTML = logs.map((l,i) => {
       const v = parseFloat(l[key]) || 0;
-      const h = v > 0 ? Math.round(((v - min)/(max - min + 0.01)) * 44) + 8 : 4;
+      const h = v > 0 ? Math.round(((v - min)/(max - min + 0.01)) * 50) + 8 : 4;
       const isSelected = i === selectedBWIndex;
       return `<div class="bw-bar-wrap" onclick="selectBWBar(${i})" style="cursor:pointer;">
         <div class="bw-bar${isSelected?' today':''}" style="height:${h}px;border-radius:6px 6px 0 0;transition:all 0.15s;${isSelected?'':'opacity:0.5;'}"></div>
@@ -699,6 +699,10 @@ function renderBWChart() {
   }
 
   if(latest) {
+    // Remove any existing date label first
+    const existingDate = document.getElementById('bw-date-label');
+    if(existingDate) existingDate.remove();
+
     const entry = logs[selectedBWIndex] || logs[logs.length-1];
     latest.innerHTML = [
       { lbl: 'Weight', val: entry.kg ? entry.kg+' kg' : '--' },
@@ -709,17 +713,18 @@ function renderBWChart() {
       <div style="font-size:16px;font-weight:700;color:var(--green2);">${s.val}</div>
     </div>`).join('');
     if(entry.date) {
-      latest.insertAdjacentHTML('beforebegin', `<div style="font-size:11px;color:var(--muted2);margin-bottom:6px;margin-top:4px;">📅 ${entry.date}</div>`);
+      const dateEl = document.createElement('div');
+      dateEl.id = 'bw-date-label';
+      dateEl.id = 'bw-date-label';
+      dateEl.style.cssText = 'font-size:11px;color:var(--muted2);margin-bottom:6px;margin-top:4px;';
+      dateEl.textContent = '📅 ' + entry.date;
+      latest.parentNode.insertBefore(dateEl, latest);
     }
   }
 }
 
 function selectBWBar(i) {
   selectedBWIndex = i;
-  // Remove date label if exists
-  const dateLbl = document.querySelector('#bw-latest + div, div[data-bwdate]');
-  const prev = document.getElementById('bw-latest').previousElementSibling;
-  if(prev && prev.textContent.includes('📅')) prev.remove();
   renderBWChart();
 }
 
