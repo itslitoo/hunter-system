@@ -333,7 +333,7 @@ body { font-family: var(--font); color: var(--text); overscroll-behavior: none; 
         <div class="bw-metric-tab" id="bwt-smm" onclick="setBWTab('smm')">SMM</div>
         <div class="bw-metric-tab" id="bwt-pbf" onclick="setBWTab('pbf')">PBF %</div>
       </div>
-      <div class="bw-chart" id="bw-chart"></div>
+      <div class="bw-chart" id="bw-chart" style="margin-top:12px;"></div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 0;" id="bw-latest"></div>
       <div style="font-size:10px;color:var(--muted2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;">Log new entry</div>
       <div style="display:flex;gap:5px;margin-bottom:5px;">
@@ -665,6 +665,8 @@ function setBWTab(tab) {
   renderBWChart();
 }
 
+let selectedBWIndex = -1; // -1 = last entry
+
 function renderBWChart() {
   const chart = document.getElementById('bw-chart');
   const latest = document.getElementById('bw-latest');
@@ -674,31 +676,51 @@ function renderBWChart() {
     if(latest) latest.innerHTML = '';
     return;
   }
+  if(selectedBWIndex === -1 || selectedBWIndex >= logs.length) selectedBWIndex = logs.length - 1;
+
   const keyMap = { weight: 'kg', smm: 'smm', pbf: 'pbf' };
-  const unitMap = { weight: 'kg', smm: 'kg', pbf: '%' };
   const key = keyMap[activeBWTab];
-  const unit = unitMap[activeBWTab];
   const vals = logs.map(l => parseFloat(l[key]) || 0).filter(v => v > 0);
+
   if(!vals.length) {
     chart.innerHTML = `<div style="font-size:11px;color:var(--muted2);padding:10px 0;">No ${activeBWTab.toUpperCase()} data yet.</div>`;
   } else {
     const max = Math.max(...vals);
-    const min = Math.min(...vals) - (activeBWTab === 'pbf' ? 1 : 1);
+    const min = Math.min(...vals) - 1;
     chart.innerHTML = logs.map((l,i) => {
       const v = parseFloat(l[key]) || 0;
-      const h = v > 0 ? Math.round(((v - min)/(max - min + 0.01)) * 40) + 8 : 4;
-      const isLast = i === logs.length-1;
-      return `<div class="bw-bar-wrap"><div class="bw-bar${isLast?' today':''}" style="height:${h}px;"></div><div class="bw-lbl">${v||'--'}</div></div>`;
+      const h = v > 0 ? Math.round(((v - min)/(max - min + 0.01)) * 44) + 8 : 4;
+      const isSelected = i === selectedBWIndex;
+      return `<div class="bw-bar-wrap" onclick="selectBWBar(${i})" style="cursor:pointer;">
+        <div class="bw-bar${isSelected?' today':''}" style="height:${h}px;border-radius:6px 6px 0 0;transition:all 0.15s;${isSelected?'':'opacity:0.5;'}"></div>
+        <div class="bw-lbl" style="${isSelected?'color:var(--green);font-weight:600;':''}">${v||'--'}</div>
+      </div>`;
     }).join('');
   }
+
   if(latest) {
-    const last = state.bodyWeightLog[state.bodyWeightLog.length-1];
+    const entry = logs[selectedBWIndex] || logs[logs.length-1];
     latest.innerHTML = [
-      { lbl: 'Weight', val: last.kg ? last.kg+' kg' : '--' },
-      { lbl: 'SMM', val: last.smm ? last.smm+' kg' : '--' },
-      { lbl: 'PBF', val: last.pbf ? last.pbf+'%' : '--' },
-    ].map(s => `<div style="background:var(--lighter);border:1px solid var(--light);padding:8px 10px;border-radius:10px;"><div style="font-size:10px;color:var(--muted2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">${s.lbl}</div><div style="font-size:16px;font-weight:700;color:var(--green2);">${s.val}</div></div>`).join('');
+      { lbl: 'Weight', val: entry.kg ? entry.kg+' kg' : '--' },
+      { lbl: 'SMM', val: entry.smm ? entry.smm+' kg' : '--' },
+      { lbl: 'PBF', val: entry.pbf ? entry.pbf+'%' : '--' },
+    ].map(s => `<div style="background:var(--lighter);border:1px solid var(--light);padding:8px 10px;border-radius:10px;">
+      <div style="font-size:10px;color:var(--muted2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">${s.lbl}</div>
+      <div style="font-size:16px;font-weight:700;color:var(--green2);">${s.val}</div>
+    </div>`).join('');
+    if(entry.date) {
+      latest.insertAdjacentHTML('beforebegin', `<div style="font-size:11px;color:var(--muted2);margin-bottom:6px;margin-top:4px;">📅 ${entry.date}</div>`);
+    }
   }
+}
+
+function selectBWBar(i) {
+  selectedBWIndex = i;
+  // Remove date label if exists
+  const dateLbl = document.querySelector('#bw-latest + div, div[data-bwdate]');
+  const prev = document.getElementById('bw-latest').previousElementSibling;
+  if(prev && prev.textContent.includes('📅')) prev.remove();
+  renderBWChart();
 }
 
 function logBodyWeight() {
