@@ -964,15 +964,15 @@ function renderMeals() {
         <div style="font-size:10px;color:var(--muted);font-weight:500;">${Math.round(typeKcal)} kcal</div>
       </div>`;
     items.forEach(m => {
-      html += `<div style="background:var(--bg3);border:1px solid var(--border);margin-bottom:5px;">
+      html += `<div style="background:var(--lighter);border:1px solid var(--light);margin-bottom:5px;border-radius:10px;">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 10px;">
           <div style="flex:1;">
-            <div style="font-size:13px;color:var(--white);font-weight:500;">${m.name}${m.grams?' <span style="color:var(--muted);font-size:11px;">· ${m.grams}g</span>':''}</div>
+            <div style="font-size:13px;color:var(--green);font-weight:600;">${m.name} <span style="color:var(--muted2);font-size:11px;font-weight:400;">· ${m.grams||''}g</span></div>
             <div style="font-size:10px;color:var(--muted2);margin-top:2px;">P:${m.protein||0}g · C:${m.carbs||0}g · F:${m.fat||0}g</div>
-            ${m.alt ? `<div style="margin-top:5px;padding-top:5px;border-top:1px dashed var(--border);"><div style="font-size:9px;color:var(--purple2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">Alternatives</div><div style="font-size:11px;color:var(--muted);line-height:1.6;">${m.alt.split('/').map(a=>'◆ '+a.trim()).join('<br>')}</div></div>` : ''}
+            ${m.alt ? `<div style="margin-top:5px;padding-top:5px;border-top:1px dashed var(--border);"><div style="font-size:9px;color:var(--green2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">Alternatives</div><div style="font-size:11px;color:var(--muted);line-height:1.6;">${m.alt.split('/').map(a=>'◆ '+a.trim()).join('<br>')}</div></div>` : ''}
           </div>
           <div style="text-align:right;margin-left:10px;flex-shrink:0;">
-            <div style="font-size:13px;color:var(--light);font-weight:600;">${m.kcal||0} kcal</div>
+            <div style="font-size:13px;color:var(--green2);font-weight:600;">${m.kcal||0} kcal</div>
             <div style="font-size:10px;color:var(--muted3);cursor:pointer;margin-top:4px;" onclick="deleteMeal(${m.idx})">✕</div>
           </div>
         </div>
