@@ -697,7 +697,7 @@ function renderBWChart() {
       { lbl: 'Weight', val: last.kg ? last.kg+' kg' : '--' },
       { lbl: 'SMM', val: last.smm ? last.smm+' kg' : '--' },
       { lbl: 'PBF', val: last.pbf ? last.pbf+'%' : '--' },
-    ].map(s => `<div style="background:var(--bg3);border:1px solid var(--border);padding:8px 10px;"><div style="font-size:10px;color:var(--muted2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">${s.lbl}</div><div style="font-size:16px;font-weight:700;color:var(--white);">${s.val}</div></div>`).join('');
+    ].map(s => `<div style="background:var(--lighter);border:1px solid var(--light);padding:8px 10px;border-radius:10px;"><div style="font-size:10px;color:var(--muted2);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:3px;">${s.lbl}</div><div style="font-size:16px;font-weight:700;color:var(--green2);">${s.val}</div></div>`).join('');
   }
 }
 
@@ -730,7 +730,7 @@ function renderPRBoard() {
   board.innerHTML = prs.map(p => `
     <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);margin-bottom:6px;">
       <div style="font-size:12px;color:var(--muted);font-weight:500;">${p.name}</div>
-      <div style="text-align:right;"><div style="font-size:14px;color:var(--white);font-weight:700;">${p.kg} kg <span style="font-size:10px;color:var(--purple3);">↑ PR</span></div><div style="font-size:10px;color:var(--muted2);">${p.date}</div></div>
+      <div style="text-align:right;"><div style="font-size:14px;color:var(--green2);font-weight:700;">${p.kg} kg <span style="font-size:10px;color:var(--green3);">↑ PR</span></div><div style="font-size:10px;color:var(--muted2);">${p.date}</div></div>
     </div>`).join('');
 }
 
